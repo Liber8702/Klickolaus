@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Klickolaus – Familiespill</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #1a3a2a;
+      color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      color: #ffd700;
+      margin-bottom: 5px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    }
+    .stats {
+      display: flex;
+      gap: 20px;
+      font-size: 1.2rem;
+      margin-bottom: 15px;
+      background: #244f3a;
+      padding: 10px 20px;
+      border-radius: 8px;
+      border: 2px solid #ffd700;
+    }
+    #board {
+      display: grid;
+      grid-template-columns: repeat(12, 42px);
+      grid-template-rows: repeat(10, 42px);
+      gap: 4px;
+      background-color: #0f2419;
+      padding: 10px;
+      border-radius: 10px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+    }
+    .tile {
+      width: 42px;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      border-radius: 6px;
+      cursor: pointer;
+      user-select: none;
+      transition: transform 0.1s ease;
+    }
+    .tile:hover {
+      transform: scale(1.08);
+      filter: brightness(1.15);
+    }
+    .tile.empty {
+      background-color: transparent !important;
+      cursor: default;
+      pointer-events: none;
+    }
+    .type-0 { background-color: #c0392b; }
+    .type-1 { background-color: #27ae60; }
+    .type-2 { background-color: #2980b9; }
+    .type-3 { background-color: #f39c12; }
+    .type-4 { background-color: #8e44ad; }
+
+    button {
+      margin-top: 15px;
+      padding: 10px 24px;
+      font-size: 1rem;
+      font-weight: bold;
+      color: #1a3a2a;
+      background-color: #ffd700;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #ffea70;
+    }
+    #message {
+      margin-top: 12px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #ffea70;
+      height: 28px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🎅 Klickolaus 🎄</h1>
+  <div class="stats">
+    <div>Poeng: <span id="score">0</span></div>
+    <div>Rekord: <span id="highscore">0</span></div>
+  </div>
+
+  <div id="board"></div>
+  <div id="message"></div>
+  <button onclick="initGame()">Nytt spill</button>
+
+  <script>
+    const ROWS = 10;
+    const COLS = 12;
+    const ICONS = ['🎅', '🎄', '🎁', '⭐', '⛄'];
+    let grid = [];
+    let score = 0;
+    let highScore = localStorage.getItem('klickolaus_highscore') || 0;
+
+    document.getElementById('highscore').textContent = highScore;
+
+    function initGame() {
+      score = 0;
+      updateScore(0);
+      document.getElementById('message').textContent = '';
+      grid = [];
+      for (let r = 0; r < ROWS; r++) {
+        const row = [];
+        for (let c = 0; c < COLS; c++) {
+          row.push(Math.floor(Math.random() * ICONS.length));
+        }
+        grid.push(row);
+      }
+      renderBoard();
+    }
+
+    function renderBoard() {
+      const board = document.getElementById('board');
+      board.innerHTML = '';
+      for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+          const val = grid[r][c];
+          const tile = document.createElement('div');
+          tile.className = val === null ? 'tile empty' : tile type-${val};
+          tile.textContent = val === null ? '' : ICONS[val];
+          if (val !== null) {
+            tile.onclick = () => handleTileClick(r, c);
+          }
+          board.appendChild(tile);
+        }
+      }
+    }
+
+    function findConnected(r, c, targetType, visited) {
+      const key = ${r},${c};
+      if (
+        r < 0 || r >= ROWS || c < 0 || c >= COLS ||
+        visited.has(key) || grid[r][c] !== targetType
+      ) {
+        return [];
+      }
+      visited.add(key);
+      let group = [[r, c]];
+      group = group.concat(findConnected(r - 1, c, targetType, visited));
+      group = group.concat(findConnected(r + 1, c, targetType, visited));
+      group = group.concat(findConnected(r, c - 1, targetType, visited));
+      group = group.concat(findConnected(r, c + 1, targetType, visited));
+      return group;
+    }
+
+    function handleTileClick(r, c) {
+      const type = grid[r][c];
+      if (type === null) return;
+
+      const group = findConnected(r, c, type, new Set());
+      if (group.length < 2) return;
+
+      for (const [gr, gc] of group) {
+        grid[gr][gc] = null;
+      }
+
+      const points = Math.pow(group.length - 1, 2) * 10;
+      updateScore(score + points);
+
+      applyGravity();
+      shiftColumns();
+      renderBoard();
+      checkGameOver();
+    }
+
+    function applyGravity() {
+      for (let c = 0; c < COLS; c++) {
+        let emptyRow = ROWS - 1;
+        for (let r = ROWS - 1; r >= 0; r--) {
+          if (grid[r][c] !== null) {
+            const temp = grid[r][c];
+            grid[r][c] = null;
+            grid[emptyRow][c] = temp;
+            emptyRow--;
+          }
+        }
+      }
+    }
+
+    function shiftColumns() {
+      let writeCol = 0;
+      for (let readCol = 0; readCol < COLS; readCol++) {
+        let hasTiles = false;
+        for (let r = 0; r < ROWS; r++) {
+          if (grid[r][readCol] !== null) {
+            hasTiles = true;
+            break;
+          }
+        }
+        if (hasTiles) {
+          if (writeCol !== readCol) {
+            for (let r = 0; r < ROWS; r++) {
+              grid[r][writeCol] = grid[r][readCol];
+              grid[r][readCol] = null;
+            }
+          }
+          writeCol++;
+        }
+      }
+    }
+
+    function checkGameOver() {
+      let remaining = 0;
+      for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+          const val = grid[r][c];
+          if (val !== null) {
+            remaining++;
+            if (
+              (r + 1 < ROWS && grid[r + 1][c] === val) ||
+              (c + 1 < COLS && grid[r][c + 1] === val)
+            ) {
+              return;
+            }
+          }
+        }
+      }
+      if (remaining === 0) {
+        updateScore(score + 1000);
+        document.getElementById('message').textContent = '🎉 Brettet er tømt! +1000 bonuspoeng!';
+      } else {
+        document.getElementById('message').textContent = Spillet er over! (${remaining} brikker igjen);
+      }
+    }
+
+    function updateScore(newScore) {
+      score = newScore;
+      document.getElementById('score').textContent = score;
+      if (score > highScore) {
+        highScore = score;
+        localStorage.setItem('klickolaus_highscore', highScore);
+        document.getElementById('highscore').textContent = highScore;
+      }
+    }
+
+    initGame();
+  </script>
+</body>
+</html>
