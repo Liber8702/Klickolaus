@@ -76,6 +76,8 @@
   <div id="message"></div>
   <button onclick="initGame()">Nytt spill</button>
   <script>
+    const klikkLyd = new Audio('klikk.mp3');
+    
     const ROWS = 10, COLS = 12;
     const ICONS = ['🎅', '🎄', '🎁', '⭐', '⛄'];
     let grid = [], score = 0;
@@ -125,6 +127,9 @@
       if (type === null) return;
       const group = findConnected(r, c, type, new Set());
       if (group.length < 2) return;
+
+      klikkLyd.currentTime = 0; 
+      klikkLyd.play();          
       group.forEach(([gr, gc]) => { grid[gr][gc] = null; });
       updateScore(score + Math.pow(group.length - 1, 2) * 10);
       applyGravity();
