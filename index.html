@@ -15,11 +15,7 @@
       margin: 0;
       padding: 20px;
     }
-    h1 {
-      color: #ffd700;
-      margin-bottom: 5px;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-    }
+    h1 { color: #ffd700; margin-bottom: 5px; }
     .stats {
       display: flex;
       gap: 20px;
@@ -38,7 +34,6 @@
       background-color: #0f2419;
       padding: 10px;
       border-radius: 10px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.6);
     }
     .tile {
       width: 42px;
@@ -50,23 +45,13 @@
       border-radius: 6px;
       cursor: pointer;
       user-select: none;
-      transition: transform 0.1s ease;
     }
-    .tile:hover {
-      transform: scale(1.08);
-      filter: brightness(1.15);
-    }
-    .tile.empty {
-      background-color: transparent !important;
-      cursor: default;
-      pointer-events: none;
-    }
+    .tile.empty { background-color: transparent !important; pointer-events: none; }
     .type-0 { background-color: #c0392b; }
     .type-1 { background-color: #27ae60; }
     .type-2 { background-color: #2980b9; }
     .type-3 { background-color: #f39c12; }
     .type-4 { background-color: #8e44ad; }
-
     button {
       margin-top: 15px;
       padding: 10px 24px;
@@ -78,52 +63,32 @@
       border-radius: 6px;
       cursor: pointer;
     }
-    button:hover {
-      background-color: #ffea70;
-    }
-    #message {
-      margin-top: 12px;
-      font-size: 1.2rem;
-      font-weight: bold;
-      color: #ffea70;
-      height: 28px;
-    }
+    #message { margin-top: 12px; font-size: 1.2rem; font-weight: bold; color: #ffea70; height: 28px; }
   </style>
 </head>
 <body>
-
   <h1>🎅 Klickolaus 🎄</h1>
   <div class="stats">
     <div>Poeng: <span id="score">0</span></div>
     <div>Rekord: <span id="highscore">0</span></div>
   </div>
-
   <div id="board"></div>
   <div id="message"></div>
   <button onclick="initGame()">Nytt spill</button>
-
   <script>
-    const ROWS = 10;
-    const COLS = 12;
+    const ROWS = 10, COLS = 12;
     const ICONS = ['🎅', '🎄', '🎁', '⭐', '⛄'];
-    let grid = [];
-    let score = 0;
+    let grid = [], score = 0;
     let highScore = localStorage.getItem('klickolaus_highscore') || 0;
-
     document.getElementById('highscore').textContent = highScore;
 
     function initGame() {
       score = 0;
       updateScore(0);
       document.getElementById('message').textContent = '';
-      grid = [];
-      for (let r = 0; r < ROWS; r++) {
-        const row = [];
-        for (let c = 0; c < COLS; c++) {
-          row.push(Math.floor(Math.random() * ICONS.length));
-        }
-        grid.push(row);
-      }
+      grid = Array.from({ length: ROWS }, () =>
+        Array.from({ length: COLS }, () => Math.floor(Math.random() * ICONS.length))
+      );
       renderBoard();
     }
 
@@ -134,47 +99,34 @@
         for (let c = 0; c < COLS; c++) {
           const val = grid[r][c];
           const tile = document.createElement('div');
-          tile.className = val === null ? 'tile empty' : tile type-${val};
+          tile.className = val === null ? 'tile empty' : 'tile type-' + val;
           tile.textContent = val === null ? '' : ICONS[val];
-          if (val !== null) {
-            tile.onclick = () => handleTileClick(r, c);
-          }
+          if (val !== null) tile.onclick = () => handleTileClick(r, c);
           board.appendChild(tile);
         }
       }
     }
 
-    function findConnected(r, c, targetType, visited) {
-      const key = ${r},${c};
-      if (
-        r < 0 || r >= ROWS || c < 0 || c >= COLS ||
-        visited.has(key) || grid[r][c] !== targetType
-      ) {
-        return [];
-      }
+    function findConnected(r, c, target, visited) {
+      const key = r + ',' + c;
+      if (r < 0 || r >= ROWS || c < 0 || c >= COLS || visited.has(key) || grid[r][c] !== target) return [];
       visited.add(key);
-      let group = [[r, c]];
-      group = group.concat(findConnected(r - 1, c, targetType, visited));
-      group = group.concat(findConnected(r + 1, c, targetType, visited));
-      group = group.concat(findConnected(r, c - 1, targetType, visited));
-      group = group.concat(findConnected(r, c + 1, targetType, visited));
-      return group;
+      return [
+        [r, c],
+        ...findConnected(r - 1, c, target, visited),
+        ...findConnected(r + 1, c, target, visited),
+        ...findConnected(r, c - 1, target, visited),
+        ...findConnected(r, c + 1, target, visited)
+      ];
     }
 
     function handleTileClick(r, c) {
       const type = grid[r][c];
       if (type === null) return;
-
       const group = findConnected(r, c, type, new Set());
       if (group.length < 2) return;
-
-      for (const [gr, gc] of group) {
-        grid[gr][gc] = null;
-      }
-
-      const points = Math.pow(group.length - 1, 2) * 10;
-      updateScore(score + points);
-
+      group.forEach(([gr, gc]) => { grid[gr][gc] = null; });
+      updateScore(score + Math.pow(group.length - 1, 2) * 10);
       applyGravity();
       shiftColumns();
       renderBoard();
@@ -198,14 +150,7 @@
     function shiftColumns() {
       let writeCol = 0;
       for (let readCol = 0; readCol < COLS; readCol++) {
-        let hasTiles = false;
-        for (let r = 0; r < ROWS; r++) {
-          if (grid[r][readCol] !== null) {
-            hasTiles = true;
-            break;
-          }
-        }
-        if (hasTiles) {
+        if (grid.some(row => row[readCol] !== null)) {
           if (writeCol !== readCol) {
             for (let r = 0; r < ROWS; r++) {
               grid[r][writeCol] = grid[r][readCol];
@@ -224,12 +169,7 @@
           const val = grid[r][c];
           if (val !== null) {
             remaining++;
-            if (
-              (r + 1 < ROWS && grid[r + 1][c] === val) ||
-              (c + 1 < COLS && grid[r][c + 1] === val)
-            ) {
-              return;
-            }
+            if ((r + 1 < ROWS && grid[r + 1][c] === val) || (c + 1 < COLS && grid[r][c + 1] === val)) return;
           }
         }
       }
@@ -237,7 +177,7 @@
         updateScore(score + 1000);
         document.getElementById('message').textContent = '🎉 Brettet er tømt! +1000 bonuspoeng!';
       } else {
-        document.getElementById('message').textContent = Spillet er over! (${remaining} brikker igjen);
+        document.getElementById('message').textContent = 'Spillet er over! (' + remaining + ' brikker igjen)';
       }
     }
 
