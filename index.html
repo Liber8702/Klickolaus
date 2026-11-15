@@ -21,7 +21,7 @@
 body {
   margin: 0;
   min-height: 100vh;
-  padding: 65px 12px 35px;
+  padding: 65px 12px 65px;
   font-family: 'Segoe UI', sans-serif;
   color: white;
   text-align: center;
@@ -91,6 +91,67 @@ body {
   z-index: 0;
 }
 
+/* JULELANDSKAP PÅ SIDENE */
+
+.side-scenery {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.cabin {
+  position: absolute;
+  bottom: 45px;
+  left: 3%;
+  font-size: clamp(65px, 10vw, 125px);
+  filter: drop-shadow(0 5px 8px #000);
+}
+
+.tree {
+  position: absolute;
+  bottom: 35px;
+  font-size: clamp(55px, 8vw, 100px);
+  filter: drop-shadow(0 5px 8px #000);
+}
+
+.tree-left {
+  left: 2%;
+}
+
+.tree-left-second {
+  left: 13%;
+  bottom: 20px;
+  font-size: clamp(45px, 6vw, 75px);
+}
+
+.tree-right {
+  right: 3%;
+}
+
+.tree-right-second {
+  right: 14%;
+  bottom: 20px;
+  font-size: clamp(45px, 6vw, 75px);
+}
+
+.snow-ground {
+  position: absolute;
+  bottom: -35px;
+  left: -5%;
+  width: 110%;
+  height: 90px;
+  background: linear-gradient(
+    to bottom,
+    #ffffff 0%,
+    #e7f5ff 65%,
+    #b7d7e9 100%
+  );
+  border-radius: 50% 50% 0 0;
+  box-shadow: 0 -5px 25px rgba(255,255,255,.3);
+}
+
 /* OVERSKRIFT */
 
 h1 {
@@ -106,6 +167,8 @@ h1 {
 }
 
 .subtitle {
+  position: relative;
+  z-index: 2;
   color: #e8f5df;
   margin-bottom: 20px;
   font-size: 1rem;
@@ -182,38 +245,6 @@ h1 {
 .garland-bottom {
   top: auto;
   bottom: -23px;
-}
-
-/* NISSE OG SLEDE */
-
-#santa {
-  position: absolute;
-  width: 310px;
-  height: auto;
-  top: 45px;
-  left: -340px;
-  z-index: 6;
-  pointer-events: none;
-  filter: drop-shadow(0 0 12px rgba(255,215,0,.65));
-  animation: santaFlight 19s linear infinite;
-}
-
-@keyframes santaFlight {
-  0% {
-    transform: translateX(0) translateY(0) rotate(-3deg);
-  }
-  25% {
-    transform: translateX(35vw) translateY(-20px) rotate(2deg);
-  }
-  50% {
-    transform: translateX(75vw) translateY(5px) rotate(-1deg);
-  }
-  75% {
-    transform: translateX(110vw) translateY(-15px) rotate(2deg);
-  }
-  100% {
-    transform: translateX(150vw) translateY(0) rotate(-2deg);
-  }
 }
 
 /* SPILLEBRETT */
@@ -375,13 +406,35 @@ button:hover {
     font-size: .9rem;
   }
 
-  #santa {
-    width: 210px;
+  .cabin {
+    left: -12px;
+    bottom: 15px;
+    font-size: 65px;
+  }
+
+  .tree-left {
+    left: 2%;
+    bottom: 15px;
+    font-size: 45px;
+  }
+
+  .tree-left-second {
+    display: none;
+  }
+
+  .tree-right {
+    right: 2%;
+    bottom: 15px;
+    font-size: 45px;
+  }
+
+  .tree-right-second {
+    display: none;
   }
 }
 
 @media(prefers-reduced-motion: reduce) {
-  .bulb, #santa {
+  .bulb {
     animation-duration: 0.01ms;
     animation-iteration-count: 1;
   }
@@ -392,6 +445,20 @@ button:hover {
 <body>
 
 <canvas id="background-snow"></canvas>
+
+<!-- JULELANDSKAP -->
+
+<div class="side-scenery">
+  <div class="cabin">🏡</div>
+
+  <div class="tree tree-left">🎄</div>
+  <div class="tree tree-left-second">🌲</div>
+
+  <div class="tree tree-right">🎄</div>
+  <div class="tree tree-right-second">🌲</div>
+
+  <div class="snow-ground"></div>
+</div>
 
 <!-- JULELYS -->
 <div class="light-string" id="lights"></div>
@@ -417,13 +484,6 @@ button:hover {
     🎄 ✨ 🎄 🎀 🎄 ✨ 🎄 🎀 🎄
   </div>
 
-  <!-- NISSE OG SLEDE -->
-  <img
-    id="santa"
-    src="https://images.unsplash.com/photo-1543589077-47d81606c1bf?w=700"
-    alt="Julenisse og julemotiv"
-  >
-
   <canvas id="board-snow"></canvas>
 
   <div id="board"></div>
@@ -442,7 +502,8 @@ button:hover {
   🎅 NYTT SPILL 🎅
 </button>
 
-<!-- BEHOLDT LYDEFFEKT -->
+<!-- LYDEFFEKT BEHOLDT -->
+
 <audio
   id="minLyd"
   src="Klikk.mp3.mp3"
@@ -450,6 +511,7 @@ button:hover {
 </audio>
 
 <script>
+
 /* JULELYS */
 
 const lights = document.getElementById('lights');
@@ -571,7 +633,8 @@ function handleTileClick(r,c) {
 
   if (group.length < 2) return;
 
-  // LYDEFFEKTEN ER BEHOLDT
+  // LYDEFFEKT
+
   const lyd = document.getElementById('minLyd');
   lyd.currentTime = 0;
   lyd.play().catch(() => {});
