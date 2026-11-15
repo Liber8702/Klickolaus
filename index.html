@@ -1,264 +1,584 @@
+
 <!DOCTYPE html>
 <html lang="no">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Klickolaus – Familiespill</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #1a3a2a;
-      color: #ffffff;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin: 0;
-      padding: 20px;
-    }
-    h1 { color: #ffd700; margin-bottom: 5px; }
-    .stats {
-      display: flex;
-      gap: 20px;
-      font-size: 1.2rem;
-      margin-bottom: 15px;
-      background: #244f3a;
-      padding: 10px 20px;
-      border-radius: 8px;
-      border: 2px solid #ffd700;
-    }
-    #board-wrapper {
-      position: relative;
-      padding: 10px;
-      border-radius: 10px;
-      background: radial-gradient(circle at top, #102a38 0%, #07131a 70%, #03080b 100%);
-      box-shadow: inset 0 0 25px rgba(0, 0, 0, 0.8), 0 6px 20px rgba(0, 0, 0, 0.4);
-      overflow: hidden;
-    }
-    #board-snow {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: 1;
-    }
-    #board {
-      position: relative;
-      z-index: 2;
-      display: grid;
-      grid-template-columns: repeat(12, 42px);
-      grid-template-rows: repeat(10, 42px);
-      gap: 4px;
-    }
-    .tile {
-      width: 42px;
-      height: 42px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 24px;
-      border-radius: 6px;
-      cursor: pointer;
-      user-select: none;
-      transition: transform 0.1s ease;
-    }
-    .tile:hover {
-      transform: scale(1.06);
-    }
-    .tile.empty { background-color: transparent !important; pointer-events: none; }
-    .type-0 { background-color: #c0392b; }
-    .type-1 { background-color: #27ae60; }
-    .type-2 { background-color: #2980b9; }
-    .type-3 { background-color: #f39c12; }
-    .type-4 { background-color: #8e44ad; }
-    button {
-      margin-top: 15px;
-      padding: 10px 24px;
-      font-size: 1rem;
-      font-weight: bold;
-      color: #1a3a2a;
-      background-color: #ffd700;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-    #message { margin-top: 12px; font-size: 1.2rem; font-weight: bold; color: #ffea70; height: 28px; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Klickolaus – Familiespill</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+  background: radial-gradient(
+    ellipse at top,
+    #132a3a 0%,
+    #0b1922 50%,
+    #091712 100%
+  );
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  margin: 0;
+  padding: 20px 10px;
+}
+
+h1 {
+  color: #ffd700;
+  margin: 0 0 12px;
+  font-size: 2.1rem;
+  letter-spacing: 1.5px;
+  text-shadow: 0 2px 12px rgba(255,215,0,.35);
+  text-align: center;
+}
+
+.stats {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 28px;
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin-bottom: 18px;
+  background: rgba(255,255,255,.07);
+  backdrop-filter: blur(10px);
+  padding: 10px 28px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,215,0,.45);
+  box-shadow: 0 6px 20px rgba(0,0,0,.4);
+}
+
+.stats span {
+  color: #ffd700;
+}
+
+#board-wrapper {
+  position: relative;
+  padding: 12px;
+  border-radius: 14px;
+  background: linear-gradient(
+    180deg,
+    #07131e,
+    #0d2233 55%,
+    #132c24
+  );
+  border: 1px solid rgba(255,215,0,.35);
+  box-shadow:
+    inset 0 0 35px rgba(0,0,0,.85),
+    0 14px 40px rgba(0,0,0,.65);
+  overflow: hidden;
+}
+
+#board-snow {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 3;
+}
+
+#santa-sleigh {
+  position: absolute;
+  top: 28px;
+  left: -260px;
+  width: 240px;
+  height: 60px;
+  pointer-events: none;
+  z-index: 1;
+  opacity: .75;
+  filter: drop-shadow(0 0 6px rgba(255,215,0,.25));
+  animation: flyAcross 18s linear infinite;
+}
+
+@keyframes flyAcross {
+  0% {
+    transform: translateX(0) translateY(0) rotate(-3deg);
+  }
+  50% {
+    transform: translateX(420px) translateY(-14px) rotate(-1deg);
+  }
+  100% {
+    transform: translateX(860px) translateY(4px) rotate(2deg);
+  }
+}
+
+#board {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(12, 42px);
+  grid-template-rows: repeat(10, 42px);
+  gap: 4px;
+}
+
+.tile {
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  border-radius: 7px;
+  cursor: pointer;
+  user-select: none;
+  transition: transform .12s ease, filter .12s ease;
+  box-shadow:
+    inset 0 2px 3px rgba(255,255,255,.22),
+    0 2px 4px rgba(0,0,0,.45);
+}
+
+.tile:hover {
+  transform: scale(1.07);
+  filter: brightness(1.12);
+}
+
+.tile.empty {
+  background: transparent !important;
+  box-shadow: none;
+  pointer-events: none;
+}
+
+.type-0 { background: linear-gradient(135deg,#c0392b,#922b21); }
+.type-1 { background: linear-gradient(135deg,#27ae60,#1e8449); }
+.type-2 { background: linear-gradient(135deg,#2980b9,#1f618d); }
+.type-3 { background: linear-gradient(135deg,#f39c12,#b9770e); }
+.type-4 { background: linear-gradient(135deg,#8e44ad,#6c3483); }
+
+button {
+  margin-top: 16px;
+  padding: 11px 28px;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #0b1922;
+  background: linear-gradient(135deg,#ffd700,#f39c12);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(255,215,0,.25);
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+
+button:hover {
+  transform: scale(1.04);
+  box-shadow: 0 6px 20px rgba(255,215,0,.4);
+}
+
+#message {
+  margin-top: 12px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #ffea70;
+  min-height: 28px;
+  text-align: center;
+  text-shadow: 0 2px 8px rgba(0,0,0,.6);
+}
+
+@media(max-width:600px) {
+  #board {
+    grid-template-columns: repeat(12, 27px);
+    grid-template-rows: repeat(10, 27px);
+    gap: 3px;
+  }
+
+  .tile {
+    width: 27px;
+    height: 27px;
+    font-size: 16px;
+    border-radius: 5px;
+  }
+
+  #board-wrapper {
+    padding: 7px;
+  }
+
+  h1 {
+    font-size: 1.7rem;
+  }
+
+  .stats {
+    gap: 16px;
+    font-size: 1rem;
+    padding: 10px 18px;
+  }
+}
+</style>
 </head>
+
 <body>
-  <h1>🎅 Klickolaus 🎄</h1>
-  <div class="stats">
-    <div>Poeng: <span id="score">0</span></div>
-    <div>Rekord: <span id="highscore">0</span></div>
-  </div>
 
-  <div id="board-wrapper">
-    <canvas id="board-snow"></canvas>
-    <div id="board"></div>
-  </div>
+<h1>🎅 Klickolaus 🎄</h1>
 
-  <div id="message"></div>
-  <button onclick="initGame()">Nytt spill</button>
+<div class="stats">
+  <div>Poeng: <span id="score">0</span></div>
+  <div>Rekord: <span id="highscore">0</span></div>
+</div>
 
-  <audio id="minLyd" src="Klikk.mp3.mp3" preload="auto"></audio>
+<div id="board-wrapper">
 
-  <script>
-    const ROWS = 10, COLS = 12;
-    const ICONS = ['🎅', '🎄', '🎁', '⭐', '⛄'];
-    let grid = [], score = 0;
-    let highScore = localStorage.getItem('klickolaus_highscore') || 0;
-    document.getElementById('highscore').textContent = highScore;
+<canvas id="board-snow"></canvas>
 
-    function initGame() {
-      score = 0;
-      updateScore(0);
-      document.getElementById('message').textContent = '';
-      grid = Array.from({ length: ROWS }, () =>
-        Array.from({ length: COLS }, () => Math.floor(Math.random() * ICONS.length))
-      );
-      renderBoard();
+<svg id="santa-sleigh"
+viewBox="0 0 320 80"
+fill="none"
+xmlns="http://www.w3.org/2000/svg">
+
+<path d="M15 58 C25 65 65 65 78 55 L82 42 L62 42 L58 50 L25 50 L18 36 L10 38Z"
+fill="#03080d" stroke="#ffd700" stroke-width=".8"/>
+
+<path d="M8 64 Q45 70 86 60"
+stroke="#ffd700" stroke-width="1.5"/>
+
+<circle cx="32" cy="40" r="9" fill="#03080d"/>
+<path d="M44 48 C44 36 58 36 58 48Z" fill="#03080d"/>
+<circle cx="51" cy="32" r="5" fill="#03080d"/>
+<path d="M47 29 L55 29 L45 22Z" fill="#c0392b"/>
+
+<path d="M56 38 Q130 48 265 40"
+stroke="#ffd700" stroke-width=".7"/>
+
+<g transform="translate(120,26)" fill="#03080d">
+<ellipse cx="20" cy="20" rx="12" ry="6"/>
+<path d="M28 17 L34 8 L38 10 L32 20Z"/>
+<path d="M33 8 L31 2 M35 8 L38 2" stroke="#03080d" stroke-width="1.3"/>
+<path d="M12 24 L8 34 M16 25 L15 35 M25 24 L29 34 M28 23 L33 32" stroke="#03080d" stroke-width="2"/>
+</g>
+
+<g transform="translate(185,22)" fill="#03080d">
+<ellipse cx="20" cy="20" rx="12" ry="6"/>
+<path d="M28 17 L34 8 L38 10 L32 20Z"/>
+<path d="M33 8 L31 2 M35 8 L38 2" stroke="#03080d" stroke-width="1.3"/>
+<path d="M12 24 L8 34 M16 25 L15 35 M25 24 L29 34 M28 23 L33 32" stroke="#03080d" stroke-width="2"/>
+</g>
+
+<g transform="translate(250,18)" fill="#03080d">
+<ellipse cx="20" cy="20" rx="12" ry="6"/>
+<path d="M28 17 L34 8 L38 10 L32 20Z"/>
+<path d="M33 8 L31 2 M35 8 L38 2" stroke="#03080d" stroke-width="1.3"/>
+<path d="M12 24 L8 34 M16 25 L15 35 M25 24 L29 34 M28 23 L33 32" stroke="#03080d" stroke-width="2"/>
+<circle cx="39" cy="10" r="2.2" fill="#ff3b30"/>
+</g>
+
+</svg>
+
+<div id="board"></div>
+</div>
+
+<div id="message"></div>
+
+<button onclick="initGame()">🎄 Nytt spill 🎄</button>
+
+<audio id="minLyd" src="Klikk.mp3.mp3" preload="auto"></audio>
+
+<script>
+const ROWS = 10;
+const COLS = 12;
+const ICONS = ['🎅','🎄','🎁','⭐','⛄'];
+
+let grid = [];
+let score = 0;
+let gameOver = false;
+let bonusAwarded = false;
+
+let highScore = Number(
+  localStorage.getItem('klickolaus_highscore') || 0
+);
+
+document.getElementById('highscore').textContent = highScore;
+
+// START NYTT SPILL
+function initGame() {
+  score = 0;
+  gameOver = false;
+  bonusAwarded = false;
+
+  updateScore(0);
+
+  document.getElementById('message').textContent = '';
+
+  grid = Array.from({length: ROWS}, () =>
+    Array.from({length: COLS}, () =>
+      Math.floor(Math.random() * ICONS.length)
+    )
+  );
+
+  renderBoard();
+}
+
+// TEGN SPILLEBRETT
+function renderBoard() {
+  const board = document.getElementById('board');
+  board.innerHTML = '';
+
+  for (let r = 0; r < ROWS; r++) {
+    for (let c = 0; c < COLS; c++) {
+
+      const val = grid[r][c];
+      const tile = document.createElement('div');
+
+      tile.className =
+        val === null ? 'tile empty' : 'tile type-' + val;
+
+      tile.textContent =
+        val === null ? '' : ICONS[val];
+
+      if (val !== null && !gameOver) {
+        tile.onclick = () => handleTileClick(r,c);
+      }
+
+      board.appendChild(tile);
     }
+  }
+}
 
-    function renderBoard() {
-      const board = document.getElementById('board');
-      board.innerHTML = '';
-      for (let r = 0; r < ROWS; r++) {
-        for (let c = 0; c < COLS; c++) {
-          const val = grid[r][c];
-          const tile = document.createElement('div');
-          tile.className = val === null ? 'tile empty' : 'tile type-' + val;
-          tile.textContent = val === null ? '' : ICONS[val];
-          if (val !== null) tile.onclick = () => handleTileClick(r, c);
-          board.appendChild(tile);
+// FINN SAMMENHENGENDE BRIKKER
+function findConnected(r,c,target,visited) {
+
+  if (
+    r < 0 || r >= ROWS ||
+    c < 0 || c >= COLS ||
+    visited.has(r + ',' + c) ||
+    grid[r][c] !== target
+  ) {
+    return [];
+  }
+
+  visited.add(r + ',' + c);
+
+  return [
+    [r,c],
+    ...findConnected(r-1,c,target,visited),
+    ...findConnected(r+1,c,target,visited),
+    ...findConnected(r,c-1,target,visited),
+    ...findConnected(r,c+1,target,visited)
+  ];
+}
+
+// KLIKK PÅ BRIKKER
+function handleTileClick(r,c) {
+
+  if (gameOver) return;
+
+  const type = grid[r][c];
+
+  if (type === null) return;
+
+  const group = findConnected(r,c,type,new Set());
+
+  // Må være minst to like brikker
+  if (group.length < 2) return;
+
+  // Spill lyd
+  const lyd = document.getElementById('minLyd');
+
+  lyd.currentTime = 0;
+  lyd.play().catch(() => {});
+
+  // Fjern brikkene
+  group.forEach(([gr,gc]) => {
+    grid[gr][gc] = null;
+  });
+
+  // Poeng
+  updateScore(
+    score + Math.pow(group.length - 1,2) * 10
+  );
+
+  applyGravity();
+  shiftColumns();
+  renderBoard();
+  checkGameOver();
+}
+
+// FALLENDE BRIKKER
+function applyGravity() {
+
+  for (let c = 0; c < COLS; c++) {
+
+    let emptyRow = ROWS - 1;
+
+    for (let r = ROWS - 1; r >= 0; r--) {
+
+      if (grid[r][c] !== null) {
+
+        const temp = grid[r][c];
+
+        grid[r][c] = null;
+        grid[emptyRow][c] = temp;
+
+        emptyRow--;
+      }
+    }
+  }
+}
+
+// FLYTT TOMME KOLONNER
+function shiftColumns() {
+
+  let writeCol = 0;
+
+  for (let readCol = 0; readCol < COLS; readCol++) {
+
+    if (grid.some(row => row[readCol] !== null)) {
+
+      if (writeCol !== readCol) {
+
+        for (let r = 0; r < ROWS; r++) {
+
+          grid[r][writeCol] = grid[r][readCol];
+          grid[r][readCol] = null;
+        }
+      }
+
+      writeCol++;
+    }
+  }
+}
+
+// SJEKK OM SPILLET ER FERDIG
+function checkGameOver() {
+
+  let remaining = 0;
+  let possibleMoves = false;
+
+  for (let r = 0; r < ROWS; r++) {
+
+    for (let c = 0; c < COLS; c++) {
+
+      const val = grid[r][c];
+
+      if (val !== null) {
+
+        remaining++;
+
+        if (
+          (r + 1 < ROWS && grid[r+1][c] === val) ||
+          (c + 1 < COLS && grid[r][c+1] === val)
+        ) {
+          possibleMoves = true;
         }
       }
     }
+  }
 
-    function findConnected(r, c, target, visited) {
-      const key = r + ',' + c;
-      if (r < 0 || r >= ROWS || c < 0 || c >= COLS || visited.has(key) || grid[r][c] !== target) return [];
-      visited.add(key);
-      return [
-        [r, c],
-        ...findConnected(r - 1, c, target, visited),
-        ...findConnected(r + 1, c, target, visited),
-        ...findConnected(r, c - 1, target, visited),
-        ...findConnected(r, c + 1, target, visited)
-      ];
+  if (remaining === 0 && !bonusAwarded) {
+
+    bonusAwarded = true;
+    gameOver = true;
+
+    updateScore(score + 1000);
+
+    document.getElementById('message').textContent =
+      '🎉 Brettet er tømt! +1000 bonuspoeng!';
+
+    renderBoard();
+
+  } else if (!possibleMoves) {
+
+    gameOver = true;
+
+    document.getElementById('message').textContent =
+      '🎅 Spillet er over! (' + remaining + ' brikker igjen)';
+
+    renderBoard();
+  }
+}
+
+// OPPDATER POENG OG REKORD
+function updateScore(newScore) {
+
+  score = newScore;
+
+  document.getElementById('score').textContent = score;
+
+  if (score > highScore) {
+
+    highScore = score;
+
+    localStorage.setItem(
+      'klickolaus_highscore',
+      highScore
+    );
+
+    document.getElementById('highscore').textContent =
+      highScore;
+  }
+}
+
+// SNØFALL
+const snowCanvas = document.getElementById('board-snow');
+const snowCtx = snowCanvas.getContext('2d');
+const wrapper = document.getElementById('board-wrapper');
+
+let flakes = [];
+
+function resizeSnow() {
+
+  snowCanvas.width = wrapper.clientWidth;
+  snowCanvas.height = wrapper.clientHeight;
+
+  flakes = Array.from({length:130}, () => ({
+    x: Math.random() * snowCanvas.width,
+    y: Math.random() * snowCanvas.height,
+    r: Math.random() * 2.4 + .6,
+    speedY: Math.random() * .85 + .3,
+    speedX: Math.random() * .5 - .25,
+    alpha: Math.random() * .75 + .2
+  }));
+}
+
+function animateBoardSnow() {
+
+  snowCtx.clearRect(
+    0,0,
+    snowCanvas.width,
+    snowCanvas.height
+  );
+
+  flakes.forEach(f => {
+
+    snowCtx.beginPath();
+
+    snowCtx.arc(
+      f.x,f.y,f.r,
+      0,Math.PI * 2
+    );
+
+    snowCtx.fillStyle =
+      `rgba(255,255,255,${f.alpha})`;
+
+    snowCtx.fill();
+
+    f.y += f.speedY;
+    f.x += f.speedX;
+
+    if (f.y > snowCanvas.height) {
+      f.y = -4;
+      f.x = Math.random() * snowCanvas.width;
     }
 
-    function handleTileClick(r, c) {
-      const type = grid[r][c];
-      if (type === null) return;
-      const group = findConnected(r, c, type, new Set());
-      if (group.length < 2) return;
+    if (f.x > snowCanvas.width) f.x = 0;
+    if (f.x < 0) f.x = snowCanvas.width;
 
-      const lyd = document.getElementById('minLyd');
-      lyd.currentTime = 0;
-      lyd.play().catch(() => {});
+  });
 
-      group.forEach(([gr, gc]) => { grid[gr][gc] = null; });
-      updateScore(score + Math.pow(group.length - 1, 2) * 10);
-      applyGravity();
-      shiftColumns();
-      renderBoard();
-      checkGameOver();
-    }
+  requestAnimationFrame(animateBoardSnow);
+}
 
-    function applyGravity() {
-      for (let c = 0; c < COLS; c++) {
-        let emptyRow = ROWS - 1;
-        for (let r = ROWS - 1; r >= 0; r--) {
-          if (grid[r][c] !== null) {
-            const temp = grid[r][c];
-            grid[r][c] = null;
-            grid[emptyRow][c] = temp;
-            emptyRow--;
-          }
-        }
-      }
-    }
+window.addEventListener('resize', resizeSnow);
 
-    function shiftColumns() {
-      let writeCol = 0;
-      for (let readCol = 0; readCol < COLS; readCol++) {
-        if (grid.some(row => row[readCol] !== null)) {
-          if (writeCol !== readCol) {
-            for (let r = 0; r < ROWS; r++) {
-              grid[r][writeCol] = grid[r][readCol];
-              grid[r][readCol] = null;
-            }
-          }
-          writeCol++;
-        }
-      }
-    }
+resizeSnow();
+animateBoardSnow();
 
-    function checkGameOver() {
-      let remaining = 0;
-      for (let r = 0; r < ROWS; r++) {
-        for (let c = 0; c < COLS; c++) {
-          const val = grid[r][c];
-          if (val !== null) {
-            remaining++;
-            if ((r + 1 < ROWS && grid[r + 1][c] === val) || (c + 1 < COLS && grid[r][c + 1] === val)) return;
-          }
-        }
-      }
-      if (remaining === 0) {
-        updateScore(score + 1000);
-        document.getElementById('message').textContent = '🎉 Brettet er tømt! +1000 bonuspoeng!';
-      } else {
-        document.getElementById('message').textContent = 'Spillet er over! (' + remaining + ' brikker igjen)';
-      }
-    }
+// START SPILLET
+initGame();
 
-    function updateScore(newScore) {
-      score = newScore;
-      document.getElementById('score').textContent = score;
-      if (score > highScore) {
-        highScore = score;
-        localStorage.setItem('klickolaus_highscore', highScore);
-        document.getElementById('highscore').textContent = highScore;
-      }
-    }
-
-    // --- LEVENDE SNØFALL INNE I SPILLEBRETTET ---
-    const snowCanvas = document.getElementById('board-snow');
-    const snowCtx = snowCanvas.getContext('2d');
-    const wrapper = document.getElementById('board-wrapper');
-    snowCanvas.width = wrapper.offsetWidth;
-    snowCanvas.height = wrapper.offsetHeight;
-
-    const flakes = Array.from({ length: 55 }, () => ({
-      x: Math.random() * snowCanvas.width,
-      y: Math.random() * snowCanvas.height,
-      r: Math.random() * 2.2 + 0.7,
-      speedY: Math.random() * 0.6 + 0.25,
-      speedX: Math.random() * 0.3 - 0.15,
-      alpha: Math.random() * 0.65 + 0.2
-    }));
-
-    function animateBoardSnow() {
-      snowCtx.clearRect(0, 0, snowCanvas.width, snowCanvas.height);
-      flakes.forEach(f => {
-        snowCtx.beginPath();
-        snowCtx.arc(f.x, f.y, f.r, 0, Math.PI * 2);
-        snowCtx.fillStyle = `rgba(255, 255, 255, ${f.alpha})`;
-        snowCtx.fill();
-
-        f.y += f.speedY;
-        f.x += f.speedX;
-        if (f.y > snowCanvas.height) { f.y = -4; f.x = Math.random() * snowCanvas.width; }
-        if (f.x > snowCanvas.width) f.x = 0;
-        if (f.x < 0) f.x = snowCanvas.width;
-      });
-      requestAnimationFrame(animateBoardSnow);
-    }
-    animateBoardSnow();
-
-    initGame();
-  </script>
+</script>
 </body>
 </html>
