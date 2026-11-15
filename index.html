@@ -439,12 +439,470 @@ button:hover {
     animation-iteration-count: 1;
   }
 }
+  
+/* =====================================
+   KLICКOLAUS – MAGISK JULEVERDEN
+===================================== */
+
+/* NORDLYS */
+
+.aurora {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 50% 0%,
+      rgba(20, 80, 65, .3), transparent 60%);
+}
+
+.aurora::before,
+.aurora::after {
+  content: "";
+  position: absolute;
+  width: 160%;
+  height: 65%;
+  left: -30%;
+  top: -20%;
+  border-radius: 50%;
+  filter: blur(45px);
+  opacity: .35;
+  mix-blend-mode: screen;
+}
+
+.aurora::before {
+  background: linear-gradient(
+    110deg,
+    transparent 15%,
+    rgba(0,255,150,.2) 35%,
+    rgba(50,255,180,.65) 48%,
+    rgba(80,100,255,.25) 65%,
+    transparent 85%
+  );
+  animation: auroraMove 13s ease-in-out infinite alternate;
+}
+
+.aurora::after {
+  background: linear-gradient(
+    100deg,
+    transparent 20%,
+    rgba(130,50,255,.2) 40%,
+    rgba(40,220,180,.45) 55%,
+    rgba(40,100,255,.3) 70%,
+    transparent 90%
+  );
+  animation: auroraMove 19s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes auroraMove {
+  0% {
+    transform: translate(-8%, 0) rotate(-8deg) scale(1);
+    opacity: .2;
+  }
+  50% {
+    transform: translate(5%, 12%) rotate(5deg) scale(1.2);
+    opacity: .55;
+  }
+  100% {
+    transform: translate(12%, -5%) rotate(-4deg) scale(1.1);
+    opacity: .3;
+  }
+}
+
+/* LEVENDE JULEBY */
+
+.christmas-village {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 170px;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.village-sky-glow {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 150px;
+  background: linear-gradient(
+    to top,
+    rgba(160,210,230,.18),
+    transparent
+  );
+}
+
+.village-house {
+  position: absolute;
+  bottom: 30px;
+  width: 85px;
+  height: 65px;
+  background: #183e36;
+  border: 2px solid #9cbab2;
+  box-shadow: 0 0 20px rgba(255,210,100,.15);
+}
+
+.village-house::before {
+  content: "";
+  position: absolute;
+  width: 65px;
+  height: 65px;
+  left: 8px;
+  top: -35px;
+  background: #244e43;
+  border-top: 3px solid #dcefff;
+  border-left: 3px solid #dcefff;
+  transform: rotate(45deg);
+  z-index: -1;
+}
+
+.village-house::after {
+  content: "";
+  position: absolute;
+  left: 32px;
+  bottom: 0;
+  width: 18px;
+  height: 35px;
+  background: #754a2c;
+  border-radius: 8px 8px 0 0;
+}
+
+.house-window {
+  position: absolute;
+  width: 17px;
+  height: 19px;
+  top: 13px;
+  background: #ffe78b;
+  border: 2px solid #9a713b;
+  box-shadow: 0 0 15px 5px rgba(255,210,80,.5);
+  animation: windowGlow 3s infinite alternate;
+}
+
+.house-window.left { left: 8px; }
+.house-window.right { right: 8px; }
+
+@keyframes windowGlow {
+  from { opacity: .65; }
+  to { opacity: 1; box-shadow: 0 0 22px 8px rgba(255,210,80,.7); }
+}
+
+.house-one { left: 5%; transform: scale(.85); }
+.house-two { left: 23%; transform: scale(.65); bottom: 15px; }
+.house-three { right: 22%; transform: scale(.75); }
+.house-four { right: 5%; transform: scale(1.05); }
+
+.village-tree {
+  position: absolute;
+  bottom: 15px;
+  font-size: 65px;
+  filter: drop-shadow(0 0 8px rgba(255,255,255,.3));
+}
+
+.village-tree.one { left: 15%; }
+.village-tree.two { right: 14%; }
+.village-tree.three { left: 43%; font-size: 45px; }
+
+/* JULEKALENDER */
+
+#calendar-button {
+  display: block;
+  margin: 15px auto 20px;
+  padding: 13px 25px;
+  position: relative;
+  z-index: 5;
+  border: 2px solid #ffe9a0;
+  border-radius: 14px;
+  background: linear-gradient(135deg,#a91e27,#65101a);
+  color: #fff4c0;
+  font-size: 1rem;
+  box-shadow: 0 0 20px rgba(255,50,50,.35);
+}
+
+#calendar-button:hover {
+  transform: scale(1.06);
+}
+
+.calendar-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  padding: 15px;
+  background: rgba(0,10,8,.88);
+  backdrop-filter: blur(8px);
+  align-items: center;
+  justify-content: center;
+  overflow-y: auto;
+}
+
+.calendar-modal.active {
+  display: flex;
+}
+
+.calendar-content {
+  position: relative;
+  width: min(650px,100%);
+  padding: 22px;
+  border: 3px solid #d6a844;
+  border-radius: 22px;
+  background:
+    radial-gradient(ellipse at top,#285b40,#092218 75%);
+  box-shadow: 0 0 45px rgba(255,215,0,.25);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.calendar-title {
+  color: #ffdf72;
+  font-size: clamp(1.5rem,5vw,2.2rem);
+  text-shadow: 0 0 15px gold;
+  margin: 5px 0;
+}
+
+.calendar-description {
+  color: #e5f5e9;
+  margin-bottom: 18px;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(4,minmax(0,1fr));
+  gap: 9px;
+}
+
+.calendar-door {
+  min-height: 75px;
+  margin: 0;
+  padding: 8px 3px;
+  border: 2px solid #d4a33b;
+  border-radius: 10px;
+  background: linear-gradient(145deg,#bd2930,#74151e);
+  color: #fff4c4;
+  font-size: 1.5rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: .2s;
+  box-shadow: inset 0 2px 5px rgba(255,255,255,.2);
+}
+
+.calendar-door:hover:not(:disabled) {
+  transform: scale(1.07);
+  box-shadow: 0 0 18px gold;
+}
+
+.calendar-door small {
+  display: block;
+  font-size: .7rem;
+  margin-top: 4px;
+}
+
+.calendar-door:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+  filter: grayscale(.5);
+}
+
+.calendar-door.opened {
+  background: linear-gradient(145deg,#b88b26,#705016);
+  border-color: #ffe78b;
+}
+
+.calendar-door.claimed {
+  background: linear-gradient(145deg,#176b42,#0b3828);
+  border-color: #6ce6a0;
+}
+
+#calendar-message {
+  min-height: 55px;
+  margin-top: 16px;
+  color: #ffe78b;
+  font-weight: bold;
+  line-height: 1.5;
+}
+
+.calendar-close {
+  display: block;
+  margin: 15px auto 0;
+  padding: 10px 25px;
+  font-size: .9rem;
+}
+
+/* MAGISK SNØKULE */
+
+#snow-globe-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(1,12,10,.92);
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  pointer-events: none;
+}
+
+#snow-globe-overlay.active {
+  display: flex;
+  animation: globeBackground 2.5s forwards;
+}
+
+.snow-globe {
+  position: relative;
+  width: min(270px,70vw);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 9px solid rgba(210,240,255,.8);
+  background:
+    radial-gradient(circle at 30% 20%,
+      rgba(255,255,255,.9),
+      rgba(130,200,230,.25) 35%,
+      rgba(10,60,70,.85) 85%);
+  box-shadow:
+    0 0 25px #b8eaff,
+    inset 0 0 30px rgba(255,255,255,.6),
+    0 0 80px rgba(80,200,255,.4);
+  overflow: hidden;
+  animation: globeShake 2.5s ease-in-out;
+}
+
+.globe-village {
+  position: absolute;
+  bottom: 35px;
+  width: 100%;
+  text-align: center;
+  font-size: 70px;
+  filter: drop-shadow(0 0 10px gold);
+}
+
+.globe-snow {
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(white 2px,transparent 3px),
+    radial-gradient(white 1px,transparent 2px),
+    radial-gradient(white 2px,transparent 3px);
+  background-size: 35px 35px,23px 23px,50px 50px;
+  animation: globeSnow .7s linear infinite;
+}
+
+.globe-base {
+  width: 210px;
+  height: 35px;
+  margin-top: -4px;
+  border-radius: 10px 10px 35px 35px;
+  background: linear-gradient(135deg,#e8c66b,#80521a);
+  box-shadow: 0 8px 25px rgba(0,0,0,.5);
+}
+
+.globe-text {
+  color: #ffe68a;
+  font-size: 1.3rem;
+  font-weight: bold;
+  margin-top: 25px;
+  text-shadow: 0 0 15px gold;
+}
+
+@keyframes globeShake {
+  0% { transform: scale(.2) rotate(-15deg); opacity: 0; }
+  15% { transform: scale(1.1) rotate(10deg); opacity: 1; }
+  30% { transform: scale(1) rotate(-8deg); }
+  45% { transform: scale(1.05) rotate(6deg); }
+  60% { transform: scale(1) rotate(-3deg); }
+  80% { transform: scale(1) rotate(0); }
+  100% { transform: scale(1.3); opacity: 0; }
+}
+
+@keyframes globeSnow {
+  from { background-position: 0 0,10px 10px,20px 0; }
+  to { background-position: 0 100px,10px 80px,20px 120px; }
+}
+
+@keyframes globeBackground {
+  0%,75% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* MOBIL */
+
+@media(max-width:600px) {
+  .christmas-village {
+    height: 110px;
+    opacity: .85;
+  }
+
+  .village-house {
+    transform: scale(.55);
+    transform-origin: bottom center;
+  }
+
+  .village-tree {
+    font-size: 40px;
+  }
+
+  .calendar-content {
+    padding: 13px;
+  }
+
+  .calendar-door {
+    min-height: 65px;
+    font-size: 1.25rem;
+  }
+
+  .calendar-grid {
+    gap: 6px;
+  }
+}
+
+@media(prefers-reduced-motion:reduce) {
+  .aurora::before,
+  .aurora::after,
+  .house-window,
+  .globe-snow {
+    animation: none !important;
+  }
+}
 </style>
 </head>
 
 <body>
 
 <canvas id="background-snow"></canvas>
+
+  
+<!-- LEVENDE NORDLYS -->
+<div class="aurora"></div>
+
+<!-- LEVENDE JULEBY -->
+<div class="christmas-village">
+  <div class="village-sky-glow"></div>
+
+  <div class="village-house house-one">
+    <div class="house-window left"></div>
+    <div class="house-window right"></div>
+  </div>
+
+  <div class="village-house house-two">
+    <div class="house-window left"></div>
+    <div class="house-window right"></div>
+  </div>
+
+  <div class="village-house house-three">
+    <div class="house-window left"></div>
+    <div class="house-window right"></div>
+  </div>
+
+  <div class="village-house house-four">
+    <div class="house-window left"></div>
+    <div class="house-window right"></div>
+  </div>
+
+  <div class="village-tree one">🎄</div>
+  <div class="village-tree two">🎄</div>
+  <div class="village-tree three">🌲</div>
+</div>
 
 <!-- JULELANDSKAP -->
 
@@ -498,9 +956,64 @@ button:hover {
   🎄 Lykke til og god jul! 🎄
 </div>
 
+  
+<!-- JULEKALENDER -->
+<button id="calendar-button" onclick="openCalendar()">
+  🎁 ÅPNE JULEKALENDEREN 🎄
+</button>
+
+<div id="calendar-modal" class="calendar-modal">
+
+  <div class="calendar-content">
+
+    <h2 class="calendar-title">
+      🎄 KLICКOLAUS JULEKALENDER 🎄
+    </h2>
+
+    <div class="calendar-description">
+      24 magiske luker med overraskelser!
+      En ny luke hver dag fra 1. desember.
+    </div>
+
+    <div id="calendar-grid" class="calendar-grid"></div>
+
+    <div id="calendar-message">
+      ✨ Vent på magien! ✨
+    </div>
+
+    <button class="calendar-close"
+      onclick="closeCalendar()">
+      ❄️ LUKK KALENDEREN
+    </button>
+
+  </div>
+</div>
+
 <button onclick="initGame()">
   🎅 NYTT SPILL 🎅
 </button>
+
+  
+<!-- MAGISK SNØKULE -->
+<div id="snow-globe-overlay">
+
+  <div class="snow-globe">
+
+    <div class="globe-snow"></div>
+
+    <div class="globe-village">
+      🏡 🎄 🏠
+    </div>
+
+  </div>
+
+  <div class="globe-base"></div>
+
+  <div class="globe-text">
+    ✨ MAGISK JULEEVENTYR ✨
+  </div>
+
+</div>
 
 <!-- LYDEFFEKT BEHOLDT -->
 
@@ -559,6 +1072,7 @@ let highScore = Number(
 document.getElementById('highscore').textContent =
   highScore;
 
+
 function initGame() {
   score = 0;
   gameOver = false;
@@ -576,7 +1090,22 @@ function initGame() {
   );
 
   renderBoard();
+
+  // MAGISK SNØKULE
+  const globe = document.getElementById('snow-globe-overlay');
+
+  globe.classList.remove('active');
+
+  // Starter animasjonen på nytt
+  void globe.offsetWidth;
+
+  globe.classList.add('active');
+
+  setTimeout(() => {
+    globe.classList.remove('active');
+  }, 2500);
 }
+
 
 function renderBoard() {
   const board = document.getElementById('board');
@@ -859,6 +1388,238 @@ animateBackgroundSnow();
 animateBoardSnow();
 
 initGame();
+
+  
+/* =====================================
+   MAGISK JULEKALENDER
+===================================== */
+
+const CALENDAR_YEAR = 2026;
+
+// Sett til true hvis du vil teste kalenderen
+// før desember. Da blir alle lukene tilgjengelige.
+const CALENDAR_TEST_MODE = false;
+
+function getCalendarDate() {
+  return new Date();
+}
+
+function getCalendarKey(day) {
+  return 'klickolaus_calendar_' +
+    CALENDAR_YEAR + '_' + day;
+}
+
+function isDoorUnlocked(day) {
+  if (CALENDAR_TEST_MODE) return true;
+
+  const now = getCalendarDate();
+
+  return (
+    now.getFullYear() === CALENDAR_YEAR &&
+    now.getMonth() === 11 &&
+    day <= now.getDate()
+  );
+}
+
+/* ÅPNE KALENDER */
+
+function openCalendar() {
+  document.getElementById('calendar-modal')
+    .classList.add('active');
+
+  renderCalendar();
+}
+
+function closeCalendar() {
+  document.getElementById('calendar-modal')
+    .classList.remove('active');
+}
+
+/* BYGG DE 24 LUKENE */
+
+function renderCalendar() {
+  const calendar = document.getElementById('calendar-grid');
+  const message = document.getElementById('calendar-message');
+
+  calendar.innerHTML = '';
+
+  const now = getCalendarDate();
+
+  if (!CALENDAR_TEST_MODE &&
+      (now.getFullYear() !== CALENDAR_YEAR ||
+       now.getMonth() !== 11)) {
+
+    if (now.getFullYear() < CALENDAR_YEAR ||
+        (now.getFullYear() === CALENDAR_YEAR &&
+         now.getMonth() < 11)) {
+
+      message.textContent =
+        '🎅 Julekalenderen åpner 1. desember ' +
+        CALENDAR_YEAR + '! 🎁';
+
+    } else {
+      message.textContent =
+        '🎄 Takk for en magisk jul! Kalenderen åpner igjen neste desember. ❤️';
+    }
+  } else {
+    message.textContent =
+      '✨ Velg en av dagens tilgjengelige luker! ✨';
+  }
+
+  for (let day = 1; day <= 24; day++) {
+
+    const door = document.createElement('button');
+
+    door.className = 'calendar-door';
+
+    const claimed = localStorage.getItem(
+      getCalendarKey(day)
+    );
+
+    const unlocked = isDoorUnlocked(day);
+
+    door.innerHTML =
+      claimed
+        ? '🎁<small>' + day + ' · Åpnet</small>'
+        : unlocked
+          ? '🎄<small>' + day + '</small>'
+          : '🔒<small>' + day + '</small>';
+
+    if (claimed) {
+      door.classList.add('claimed');
+    } else if (unlocked) {
+      door.classList.add('opened');
+    }
+
+    door.disabled = !unlocked || !!claimed;
+
+    door.onclick = () => openCalendarDoor(day);
+
+    calendar.appendChild(door);
+  }
+}
+
+/* ÅPNE EN LUKE */
+
+function openCalendarDoor(day) {
+
+  if (!isDoorUnlocked(day)) {
+    return;
+  }
+
+  const key = getCalendarKey(day);
+
+  if (localStorage.getItem(key)) {
+    return;
+  }
+
+  // Registrer at dagens luke er åpnet
+  localStorage.setItem(key, 'true');
+
+  const message = document.getElementById('calendar-message');
+
+  /* FORSKJELLIGE OVERRASKELSER */
+
+  if (day === 24) {
+
+    updateScore(score + 1000);
+
+    message.innerHTML =
+      '🎅🎄 GOD JUL! 🎄🎅<br>' +
+      'Du fant den store julegaven!<br>' +
+      '⭐ +1000 BONUSPOENG!';
+
+  } else if (day % 3 === 0) {
+
+    startChristmasChallenge(day);
+
+  } else if (day % 3 === 1) {
+
+    const bonus = day * 25 + 100;
+
+    updateScore(score + bonus);
+
+    message.innerHTML =
+      '🎁 DU FANT EN MAGISK JULEGAVE!<br>' +
+      '⭐ +' + bonus + ' BONUSPOENG!';
+
+  } else {
+
+    updateScore(score + 150);
+
+    message.innerHTML =
+      '✨ NISSENS HEMMELIGE OVERRASKELSE!<br>' +
+      '🎄 +150 POENG OG ET NYTT MAGISK BRETT!';
+
+    startChristmasChallenge(day);
+  }
+
+  renderCalendar();
+}
+
+/* ALTERNATIVE SPILLNIVÅER */
+
+function startChristmasChallenge(day) {
+
+  score += 0;
+  gameOver = false;
+  bonusAwarded = false;
+
+  // Et spesielt utfordringsbrett
+  // med bare to forskjellige brikketyper.
+  const firstType = day % ICONS.length;
+  const secondType = (day + 2) % ICONS.length;
+
+  grid = Array.from({length:ROWS}, () =>
+    Array.from({length:COLS}, () =>
+      Math.random() < 0.5 ? firstType : secondType
+    )
+  );
+
+  renderBoard();
+
+  document.getElementById('message').textContent =
+    '❄️ JULEUTFORDRING! LUKE ' + day +
+    ' – TØM DET MAGISKE BRETTET! 🎄';
+}
+
+/* KALENDERKNAPPENS DATO */
+
+function updateCalendarButton() {
+
+  const button = document.getElementById('calendar-button');
+
+  if (CALENDAR_TEST_MODE) {
+    button.textContent = '🎁 JULEKALENDER – TESTMODUS 🎄';
+    return;
+  }
+
+  const now = getCalendarDate();
+
+  if (now.getFullYear() === CALENDAR_YEAR &&
+      now.getMonth() === 11) {
+
+    button.textContent =
+      '🎁 JULEKALENDER – DAG ' +
+      Math.min(now.getDate(),24) + ' 🎄';
+
+  } else if (
+    now.getFullYear() < CALENDAR_YEAR ||
+    (now.getFullYear() === CALENDAR_YEAR &&
+     now.getMonth() < 11)
+  ) {
+
+    button.textContent =
+      '🎁 JULEKALENDER – ÅPNER 1. DESEMBER 🎄';
+
+  } else {
+
+    button.textContent =
+      '🎁 JULEKALENDER – GOD JUL! 🎄';
+  }
+}
+
+updateCalendarButton();
 
 </script>
 </body>
